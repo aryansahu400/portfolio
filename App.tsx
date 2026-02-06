@@ -90,7 +90,7 @@ const App: React.FC = () => {
             <div className="reveal">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-cyan-500/20 bg-cyan-500/5 text-[10px] mono font-bold uppercase tracking-[0.2em] text-cyan-400 mb-8">
                 <span className="w-1.5 h-1.5 bg-cyan-500 animate-pulse"></span>
-                System Node: Bhopal, IN
+                Bhopal, IN
               </div>
               
               <h1 className="text-5xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9] text-white">
@@ -102,8 +102,20 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-6">
-                <a href="#experience" className="px-8 py-4 bg-cyan-500 text-black font-bold mono text-sm hover:bg-white transition-all transform hover:-translate-y-1">
-                  &gt; INIT_CAREER_DATA
+                <a
+                  className="group relative px-8 py-5 w-[170px]
+                            bg-cyan-500 text-black font-bold mono text-sm
+                            transition-all duration-300 transform hover:-translate-y-1"
+                >
+                  <span className="absolute inset-0 flex items-center justify-center
+                                  opacity-100 group-hover:opacity-0 transition-opacity duration-200">
+                    &gt; LOG
+                  </span>
+
+                  <span className="absolute inset-0 flex items-center justify-center
+                                  opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    &gt; EXPERIENCE
+                  </span>
                 </a>
                 <div className="flex items-center gap-6 text-slate-500">
                   <a href={`https://${PERSONAL_DATA.linkedin}`} target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition-all"><Linkedin className="w-5 h-5" /></a>
