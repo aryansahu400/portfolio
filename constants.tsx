@@ -3,8 +3,9 @@ import { NavItem, CareerItem, ProjectItem, AchievementItem } from './types';
 
 export const PERSONAL_DATA = {
   name: "Aryan Sahu",
-  summary: "Specializing in high-performance backend systems and reactive architectures. Passionate about crafting high-quality software with modern Java and reactive programming.",
+  summary: "Specializing in high-performance backend systems and reactive architectures. Passionate about security, concurrency, and long-term maintainability.",
   email: "aryansahu400@gmail.com",
+  professionalEmail: "contact@aryaura.in",
   linkedin: "linkedin.com/in/aryansahu400",
   github: "github.com/aryansahu400"
 };

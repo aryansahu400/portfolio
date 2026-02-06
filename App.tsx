@@ -4,11 +4,13 @@ import { Cpu, Mail, ArrowRight, Linkedin, Github, Award, ChevronRight } from 'lu
 import GridBackground from './components/GridBackground';
 import AssistantTerminal from './components/AssistantTerminal';
 import { PERSONAL_DATA, NAV_ITEMS, EXPERTISE, CAREER, PROJECTS, ACHIEVEMENTS } from './constants';
+import { useExperienceTimer } from "./hooks/useExperienceTimer";
 
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [typedText, setTypedText] = useState('');
+  const experienceTime = useExperienceTimer();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -61,8 +63,8 @@ const App: React.FC = () => {
               <div className="absolute inset-0 bg-cyan-500/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </div>
             <div className="hidden sm:block">
-              <div className="text-[10px] mono text-cyan-500 font-bold tracking-widest uppercase opacity-60">Status: Active</div>
-              <div className="text-sm font-extrabold tracking-tighter">Aryaura - {PERSONAL_DATA.name}</div>
+              <div className="text-[10px] mono text-cyan-500 font-bold tracking-widest uppercase opacity-60">Aryaura</div>
+              <div className="text-sm font-extrabold tracking-tighter">{PERSONAL_DATA.name}</div>
             </div>
           </div>
           
@@ -72,7 +74,7 @@ const App: React.FC = () => {
                 {item.label}
               </a>
             ))}
-            <a href={`mailto:${PERSONAL_DATA.email}`} className="px-5 py-2 border border-cyan-500/30 text-cyan-400 mono text-[10px] font-bold uppercase hover:bg-cyan-500 hover:text-black transition-all">Connect</a>
+            <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className="px-5 py-2 border border-cyan-500/30 text-cyan-400 mono text-[10px] font-bold uppercase hover:bg-cyan-500 hover:text-black transition-all">Connect</a>
           </div>
 
           <button className="md:hidden text-white p-2">
@@ -106,14 +108,14 @@ const App: React.FC = () => {
                 <div className="flex items-center gap-6 text-slate-500">
                   <a href={`https://${PERSONAL_DATA.linkedin}`} target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition-all"><Linkedin className="w-5 h-5" /></a>
                   <a href={`https://${PERSONAL_DATA.github}`} target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition-all"><Github className="w-5 h-5" /></a>
-                  <a href={`mailto:${PERSONAL_DATA.email}`} className="hover:text-cyan-400 transition-all"><Mail className="w-5 h-5" /></a>
+                  <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className="hover:text-cyan-400 transition-all"><Mail className="w-5 h-5" /></a>
                 </div>
               </div>
             </div>
 
             <div className="hidden lg:block reveal relative" style={{transitionDelay: '200ms'}}>
               <div className="glass p-8 border-cyan-500/20 rounded-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 mono text-[10px] text-cyan-500/40">Java</div>
+                <div className="absolute top-0 right-0 p-4 mono text-[10px] text-cyan-500/40">Java 21</div>
                 <div className="space-y-4 mono text-sm">
                   <div className="flex gap-4">
                     <span className="text-cyan-500/50">01</span>
@@ -132,63 +134,70 @@ const App: React.FC = () => {
                     <span className="text-cyan-500/50">03</span>
                     &nbsp;&nbsp;<span className="text-purple-400">private</span> var expertise = <span className="text-yellow-400">StackProfile</span>
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex gap-0">
                     <span className="text-cyan-500/50">04</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.builder()
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.builder()
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-0">
                     <span className="text-cyan-500/50">05</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.frameworks(
-                    <span className="text-green-400">"Spring", "Hibernate", "jOOQ"</span>)
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.frameworks(
+                    <span className="text-green-400">"Spring", "Hibernate"</span>)
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-0">
                     <span className="text-cyan-500/50">06</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.datastores(
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.datastores(
                     <span className="text-green-400">"PostgreSQL", "Redis", "Vertica"</span>)
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-0">
                     <span className="text-cyan-500/50">07</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.messaging(
-                    <span className="text-green-400">"Kafka"</span>)
-                    .build();
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.security(
+                    <span className="text-green-400">"Spring Security"</span>)
+                  </div>
+
+                   <div className="flex gap-0">
+                    <span className="text-cyan-500/50">08</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build();
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-cyan-500/50">08</span>
+                    <span className="text-cyan-500/50">09</span>
                     &nbsp;&nbsp;<span className="text-purple-400">public</span>
                     <span className="text-yellow-400">SystemState</span>
                     <span className="text-blue-400">architectSystems</span>() {'{'}
                   </div>
 
-                  <div className="flex gap-4">
-                    <span className="text-cyan-500/50">09</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-purple-400">return</span>
-                    <span className="text-yellow-400">Architect</span>
+                  <div className="flex gap-0">
+                    <span className="text-cyan-500/50">10</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-purple-400">return</span>
+                    &nbsp;&nbsp;<span className="text-yellow-400">Architect</span>
                     .design(<span className="text-yellow-400">ScalableSystems</span>.vNext())
-                    .deploy();
+                  </div>
+                  <div className="flex gap-0">
+                    <span className="text-cyan-500/50">11</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.deploy();
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-cyan-500/50">10</span>
+                    <span className="text-cyan-500/50">12</span>
                     &nbsp;&nbsp;{'}'}
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="text-cyan-500/50">11</span>
+                    <span className="text-cyan-500/50">13</span>
                     {'}'}
                   </div>
 
                 </div>
                 <div className="mt-8 pt-8 border-t border-white/5 flex justify-between items-end">
                   <div>
-                    <div className="text-[10px] mono text-slate-500 uppercase mb-1">Current Focus</div>
-                    <div className="text-white font-bold">Reactive Architectures</div>
+                    <div className="text-[12px] mono text-slate-300 uppercase mb-1">Building solutions since</div>
+                    
                   </div>
-                  <div className="w-16 h-16 rounded-full border border-cyan-500/20 flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full border-t-2 border-cyan-500 animate-spin"></div>
+                  <div className="flex items-center justify-center">
+                    <div className="text-[15px] text-white font-bold">{experienceTime}</div>
                   </div>
                 </div>
               </div>
@@ -307,7 +316,7 @@ const App: React.FC = () => {
               Ready to Scale?
             </h2>
             <p className="mono text-slate-500 mb-16 text-lg">Initiate collaboration through official channels.</p>
-            <a href={`mailto:${PERSONAL_DATA.email}`} className="inline-flex items-center gap-4 px-12 py-6 bg-cyan-500 text-black font-bold mono text-sm hover:bg-white transition-all transform hover:scale-105">
+            <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className="inline-flex items-center gap-4 px-12 py-6 bg-cyan-500 text-black font-bold mono text-sm hover:bg-white transition-all transform hover:scale-105">
               EXECUTE_CONTACT <ArrowRight className="w-4 h-4" />
             </a>
           </div>

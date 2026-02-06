@@ -3,6 +3,48 @@
  * ARYAN SAHU - Engineering Portfolio
  * Pure Vanilla JavaScript - Cyber-Systems Theme
  */
+import { useEffect, useState } from "react";
+
+function useExperienceTimer() {
+  const startDate = new Date("2023-06-01T00:00:00");
+
+  const calculate = () => {
+    const now = new Date();
+
+    let years = now.getFullYear() - startDate.getFullYear();
+    let months = now.getMonth() - startDate.getMonth();
+    let days = now.getDate() - startDate.getDate();
+
+    if (days < 0) {
+      months--;
+      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    const seconds =
+      Math.floor((now.getTime() - startDate.getTime()) / 1000) % 60;
+
+    return `${years}y ${months}m ${days}d ${seconds}s`;
+  };
+
+  const [time, setTime] = useState(calculate());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(calculate());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return time;
+}
+
 
 const PERSONAL_DATA = {
   name: "Aryan Sahu",
