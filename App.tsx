@@ -113,17 +113,74 @@ const App: React.FC = () => {
 
             <div className="hidden lg:block reveal relative" style={{transitionDelay: '200ms'}}>
               <div className="glass p-8 border-cyan-500/20 rounded-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 mono text-[10px] text-cyan-500/40">v3.0.0-react</div>
+                <div className="absolute top-0 right-0 p-4 mono text-[10px] text-cyan-500/40">Java</div>
                 <div className="space-y-4 mono text-sm">
-                  <div className="flex gap-4"><span className="text-cyan-500/50">01</span> <span className="text-purple-400">class</span> <span className="text-yellow-400">Engineer</span> {'{'}</div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">02</span> &nbsp;&nbsp;<span className="text-purple-400">private</span> String name = <span className="text-green-400">"Aryan Sahu"</span>;</div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">03</span> &nbsp;&nbsp;<span className="text-purple-400">private</span> List&lt;Stack&gt; expertise = [</div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">04</span> &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-green-400">"Spring Webflux", "Kafka", "Redis"</span></div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">05</span> &nbsp;&nbsp;];</div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">06</span> &nbsp;&nbsp;<span className="text-purple-400">public</span> void <span className="text-blue-400">buildFuture</span>() {'{'}</div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">07</span> &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-blue-400">this</span>.deploy(<span className="text-yellow-400">ScalableSystems</span>.v3());</div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">08</span> &nbsp;&nbsp;{'}'}</div>
-                  <div className="flex gap-4"><span className="text-cyan-500/50">09</span> {'}'}</div>
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">01</span>
+                    <span className="text-purple-400">final</span>
+                    <span className="text-purple-400">class</span>
+                    <span className="text-yellow-400">Engineer</span> {'{'}
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">02</span>
+                    &nbsp;&nbsp;<span className="text-purple-400">private static final</span> String NAME =
+                    <span className="text-green-400">"Aryan Sahu"</span>;
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">03</span>
+                    &nbsp;&nbsp;<span className="text-purple-400">private</span> var expertise = <span className="text-yellow-400">StackProfile</span>
+                  </div>
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">04</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.builder()
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">05</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.frameworks(
+                    <span className="text-green-400">"Spring", "Hibernate", "jOOQ"</span>)
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">06</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.datastores(
+                    <span className="text-green-400">"PostgreSQL", "Redis", "Vertica"</span>)
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">07</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.messaging(
+                    <span className="text-green-400">"Kafka"</span>)
+                    .build();
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">08</span>
+                    &nbsp;&nbsp;<span className="text-purple-400">public</span>
+                    <span className="text-yellow-400">SystemState</span>
+                    <span className="text-blue-400">architectSystems</span>() {'{'}
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">09</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-purple-400">return</span>
+                    <span className="text-yellow-400">Architect</span>
+                    .design(<span className="text-yellow-400">ScalableSystems</span>.vNext())
+                    .deploy();
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">10</span>
+                    &nbsp;&nbsp;{'}'}
+                  </div>
+
+                  <div className="flex gap-4">
+                    <span className="text-cyan-500/50">11</span>
+                    {'}'}
+                  </div>
+
                 </div>
                 <div className="mt-8 pt-8 border-t border-white/5 flex justify-between items-end">
                   <div>
