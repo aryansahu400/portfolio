@@ -7,7 +7,8 @@ export const PERSONAL_DATA = {
   email: "aryansahu400@gmail.com",
   professionalEmail: "contact@aryaura.in",
   linkedin: "linkedin.com/in/aryansahu400",
-  github: "github.com/aryansahu400"
+  github: "github.com/aryansahu400",
+  whatsapp: "918839576430"
 };
 
 export const NAV_ITEMS: NavItem[] = [
@@ -18,10 +19,11 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const EXPERTISE = [
-  "Java", "Reactive Programming", "Spring Boot", "Spring Webflux", 
-  "Kafka", "Redis", "SSE", "JOOQ", "Postgres", "SQL", 
-  "Vertica", "ETL", "JWT - RSA 256", "IronPDF", "Git", "Hibernate",
-  "Duck-DB", "WebClient"
+  "Java", "Spring Boot", "Spring Security","Spring Webflux","Spring Gateway", "Quartz Scheduler",
+  "SSO","OAuth 2","OIDC","SAML", "RBAC", "ABAC",
+  "Hibernate", "Hikari","Postgres","Vertica", "Redis", "Kafka",  
+  "Git", "Duck-DB","Azure blob", "AWS SES"
+  
 ];
 
 export const CAREER: CareerItem[] = [

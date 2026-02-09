@@ -329,7 +329,10 @@ const App: React.FC = () => {
             </h2>
             <p className="mono text-slate-500 mb-16 text-lg">Initiate collaboration through official channels.</p>
             <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className="inline-flex items-center gap-4 px-12 py-6 bg-cyan-500 text-black font-bold mono text-sm hover:bg-white transition-all transform hover:scale-105">
-              EXECUTE_CONTACT <ArrowRight className="w-4 h-4" />
+              Email <ArrowRight className="w-4 h-4" />
+            </a>
+            <a href={`https://wa.me/${PERSONAL_DATA.whatsapp}`} className="inline-flex items-center gap-4 px-12 py-6 bg-cyan-500 text-black font-bold mono text-sm hover:bg-white transition-all transform hover:scale-105">
+              WhatsApp <ArrowRight className="w-4 h-4" />
             </a>
           </div>
         </section>
