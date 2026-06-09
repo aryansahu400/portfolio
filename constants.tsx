@@ -3,7 +3,7 @@ import { NavItem, CareerItem, ProjectItem, AchievementItem } from './types';
 
 export const PERSONAL_DATA = {
   name: "Aryan Sahu",
-  summary: "Specializing in high-performance backend systems and reactive architectures. Passionate about security, concurrency, and long-term maintainability.",
+  summary: "Specializing in high-performance backend systems and low-code platform engineering. Passionate about security, scalable architecture, and long-term maintainability.",
   email: "aryansahu400@gmail.com",
   professionalEmail: "contact@aryaura.in",
   linkedin: "linkedin.com/in/aryansahu400",
@@ -19,7 +19,7 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const EXPERTISE = [
-  "Java", "Spring Boot", "Spring Security","Spring Webflux","Spring Gateway", "Quartz Scheduler",
+  "Java", "Spring Boot", "Spring Security","Spring Webflux","Spring Gateway", "Spring AI", "MCP Servers", "Quartz Scheduler",
   "SSO","OAuth 2","OIDC","SAML", "RBAC", "ABAC",
   "Hibernate", "Hikari","Postgres","Vertica", "Redis", "Kafka",  
   "Git", "Duck-DB","Azure blob", "AWS SES"
@@ -29,8 +29,21 @@ export const EXPERTISE = [
 export const CAREER: CareerItem[] = [
   {
     company: "Lumenore (Netlink Pvt. Ltd.)",
+    role: "Software Engineer",
+    period: "08/2025 - Present",
+    desc: [
+      "Architected and delivered Lumenore Studio, a multi-tenant, multi-application low-code platform for building production-ready apps via drag-and-drop — serving [N] tenants and [M]+ users.",
+      "Engineered a workflow automation server on an extensible, node-based execution engine with 25+ node types (SQL, JavaScript, email, SMS, telephony, cookie management, AI-driven actions, and more).",
+      "Designed a flexible data management layer that lets users connect their own databases or use a managed built-in datastore.",
+      "Built a complete authentication and session layer with enterprise SSO (Apple, Google, Microsoft), end-to-end activity logging, and audit-ready traceability.",
+      "Implemented fine-grained RBAC across the multi-tenant architecture, enforcing strict data isolation between tenants and applications.",
+      "Developed a library of reusable, configurable UI components with versioning and one-click publishing to accelerate end-user app development."
+    ]
+  },
+  {
+    company: "Lumenore (Netlink Pvt. Ltd.)",
     role: "Associate Software Engineer",
-    period: "06/2023 - Present",
+    period: "06/2023 - 07/2025",
     desc: [
       "Developed a Gateway Server to manage traffic and facilitate microservice communication with Auth/Audit functionalities.",
       "Implemented robust session management using JWTs and Redis, utilizing Kafka for real-time activity monitoring.",
@@ -53,6 +66,18 @@ export const CAREER: CareerItem[] = [
 ];
 
 export const PROJECTS: ProjectItem[] = [
+  {
+    title: "Lumenore Studio",
+    category: "Low-Code Platform",
+    description: "Multi-tenant, multi-application low-code platform for building production-ready apps via drag-and-drop, with visual workflows, flexible data management, and enterprise SSO.",
+    tools: ["Spring Boot", "Multi-Tenancy", "SSO", "RBAC", "PostgreSQL"]
+  },
+  {
+    title: "Workflow Automation Server",
+    category: "Automation Engine",
+    description: "Node-based execution engine powering 25+ node types — SQL, JavaScript, email, SMS, telephony, cookie management, and AI-driven actions.",
+    tools: ["Java", "Spring Boot", "Spring AI", "Kafka"]
+  },
   {
     title: "Sanjeevani Application",
     category: "Health Systems",

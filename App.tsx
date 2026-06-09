@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Cpu, Mail, ArrowRight, Linkedin, Github, Award, ChevronRight } from 'lucide-react';
 import GridBackground from './components/GridBackground';
-import AssistantTerminal from './components/AssistantTerminal';
 import { PERSONAL_DATA, NAV_ITEMS, EXPERTISE, CAREER, PROJECTS, ACHIEVEMENTS } from './constants';
 import { useExperienceTimer } from "./hooks/useExperienceTimer";
 
@@ -103,6 +102,7 @@ const App: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-6">
                 <a
+                  href="#experience"
                   className="group relative px-8 py-5 w-[170px]
                             bg-cyan-500 text-black font-bold mono text-sm
                             transition-all duration-300 transform hover:-translate-y-1"
@@ -350,9 +350,6 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
-
-      {/* AI Assistant Floating Terminal */}
-      <AssistantTerminal />
     </div>
   );
 };
