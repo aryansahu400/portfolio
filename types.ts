@@ -22,9 +22,3 @@ export interface AchievementItem {
   title: string;
   detail: string;
 }
-
-export interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
-}

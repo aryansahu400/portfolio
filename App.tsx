@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Cpu, Mail, ArrowRight, Linkedin, Github, Award, ChevronRight } from 'lucide-react';
 import GridBackground from './components/GridBackground';
-import AssistantTerminal from './components/AssistantTerminal';
 import { PERSONAL_DATA, NAV_ITEMS, EXPERTISE, CAREER, PROJECTS, ACHIEVEMENTS } from './constants';
 import { useExperienceTimer } from "./hooks/useExperienceTimer";
 
@@ -350,9 +349,6 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
-
-      {/* AI Assistant Floating Terminal */}
-      <AssistantTerminal />
     </div>
   );
 };
