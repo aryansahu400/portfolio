@@ -102,6 +102,7 @@ const App: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-6">
                 <a
+                  href="#experience"
                   className="group relative px-8 py-5 w-[170px]
                             bg-cyan-500 text-black font-bold mono text-sm
                             transition-all duration-300 transform hover:-translate-y-1"
