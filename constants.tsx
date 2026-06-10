@@ -13,9 +13,9 @@ export const PERSONAL_DATA = {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Expertise', href: '#skills' },
-  { label: 'Log', href: '#experience' },
-  { label: 'Deployments', href: '#projects' },
-  { label: 'Metrics', href: '#achievements' }
+  { label: 'Trajectory', href: '#experience' },
+  { label: 'Craft', href: '#projects' },
+  { label: 'Impact', href: '#achievements' }
 ];
 
 export const EXPERTISE = [
