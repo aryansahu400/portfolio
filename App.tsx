@@ -460,9 +460,6 @@ const App: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-8">
               {PROJECTS.map((proj, idx) => (
                 <div key={idx} className="p-10 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-800 group relative overflow-hidden hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
-                  <div className="absolute top-0 right-0 p-6 text-slate-200 dark:text-slate-800 mono text-[40px] font-black pointer-events-none group-hover:text-blue-600/10 dark:group-hover:text-blue-400/10 transition-colors">
-                    {proj.category.split(' ')[0][0]}
-                  </div>
                   <div className="mb-8 mono text-xs text-blue-600 dark:text-blue-400 font-bold tracking-widest uppercase">{proj.category}</div>
                   <h3 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-6 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{proj.title}</h3>
                   <p className="text-slate-600 dark:text-slate-400 mb-10 leading-relaxed mono text-sm">{proj.description}</p>

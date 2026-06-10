@@ -56,21 +56,27 @@ export const CAREER: CareerItem[] = [
       "Architected and delivered Lumenore Studio, a multi-tenant, multi-application low-code platform for building production-ready apps via drag-and-drop — serving [N] tenants and [M]+ users.",
       "Engineered a workflow automation server on an extensible, node-based execution engine with 25+ node types (SQL, JavaScript, email, SMS, telephony, cookie management, AI-driven actions, and more).",
       "Designed a flexible data management layer that lets users connect their own databases or use a managed built-in datastore.",
-      "Built a complete authentication and session layer with enterprise SSO (Apple, Google, Microsoft), end-to-end activity logging, and audit-ready traceability.",
-      "Implemented fine-grained RBAC across the multi-tenant architecture, enforcing strict data isolation between tenants and applications.",
-      "Developed a library of reusable, configurable UI components with versioning and one-click publishing to accelerate end-user app development."
+      "Built a complete authentication and session layer with enterprise SSO (Apple, Google, Microsoft), end-to-end activity logging, and audit-ready traceability."
     ]
   },
   {
     company: "Lumenore (Netlink Pvt. Ltd.)",
     role: "Associate Software Engineer",
-    period: "06/2023 - 07/2025",
+    period: "08/2024 - 07/2025",
     desc: [
       "Developed a Gateway Server to manage traffic and facilitate microservice communication with Auth/Audit functionalities.",
       "Implemented robust session management using JWTs and Redis, utilizing Kafka for real-time activity monitoring.",
+      "Developed a scalable Notification Module using Java Webflux and Server-Sent Events (SSE) for real-time triggers.",
+      "Implemented fine-grained RBAC across the multi-tenant architecture, enforcing strict data isolation between tenants and applications."
+    ]
+  },
+  {
+    company: "Lumenore (Netlink Pvt. Ltd.)",
+    role: "Trainee",
+    period: "05/2023 - 07/2024",
+    desc: [
       "Engineered a Migration API for seamless data transfer of no-code apps built by the Lumenore App Builder.",
       "Built a Media Module with SFTP integration for efficient enterprise-level file management.",
-      "Developed a scalable Notification Module using Java Webflux and Server-Sent Events (SSE) for real-time triggers.",
       "Ensured regulatory adherence for HIPAA and GDPR compliance across sensitive data handling modules."
     ]
   },
