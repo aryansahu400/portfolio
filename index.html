@@ -81,6 +81,11 @@
       animation: blink 1s infinite;
       color: var(--accent);
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .typing-cursor::after { animation: none; }
+    }
   </style>
 <script type="importmap">
 {

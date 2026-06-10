@@ -6,6 +6,7 @@ import React, { useEffect, useRef } from 'react';
  * Faint dots rest across the page; dots near the cursor smoothly scale up and
  * tint toward the accent color, creating a soft spotlight that follows the mouse.
  * Theme-aware: neutral slate on light, soft white on dark.
+ * Respects prefers-reduced-motion (renders a static grid, no animation/spotlight).
  */
 const GridBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,6 +20,7 @@ const GridBackground: React.FC = () => {
     const SPACING = 38;     // distance between dots
     const INFLUENCE = 160;  // cursor effect radius
     const EASE = 0.1;       // spotlight follow smoothing
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let width = 0;
     let height = 0;
@@ -30,10 +32,7 @@ const GridBackground: React.FC = () => {
     let hasMouse = false;
 
     let isDark = document.documentElement.classList.contains('dark');
-    const themeObserver = new MutationObserver(() => {
-      isDark = document.documentElement.classList.contains('dark');
-    });
-    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    let animationFrameId = 0;
 
     const resize = () => {
       width = window.innerWidth;
@@ -46,19 +45,6 @@ const GridBackground: React.FC = () => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
-
-    const handleMouseMove = (e: MouseEvent) => {
-      target.x = e.clientX;
-      target.y = e.clientY;
-      hasMouse = true;
-    };
-    const handleMouseLeave = () => { hasMouse = false; };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('resize', resize);
-    document.addEventListener('mouseleave', handleMouseLeave);
-
-    let animationFrameId: number;
 
     const draw = () => {
       smooth.x += (target.x - smooth.x) * EASE;
@@ -79,7 +65,7 @@ const GridBackground: React.FC = () => {
           let cg = base[1];
           let cb = base[2];
 
-          if (hasMouse) {
+          if (!reduce && hasMouse) {
             const dx = x - smooth.x;
             const dy = y - smooth.y;
             const distSq = dx * dx + dy * dy;
@@ -101,14 +87,38 @@ const GridBackground: React.FC = () => {
         }
       }
 
-      animationFrameId = requestAnimationFrame(draw);
+      if (!reduce) animationFrameId = requestAnimationFrame(draw);
     };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      target.x = e.clientX;
+      target.y = e.clientY;
+      hasMouse = true;
+    };
+    const handleMouseLeave = () => { hasMouse = false; };
+
+    const onResize = () => {
+      resize();
+      if (reduce) draw(); // static mode needs an explicit redraw
+    };
+
+    const themeObserver = new MutationObserver(() => {
+      isDark = document.documentElement.classList.contains('dark');
+      if (reduce) draw();
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    window.addEventListener('resize', onResize);
+    if (!reduce) {
+      window.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseleave', handleMouseLeave);
+    }
 
     draw();
 
     return () => {
+      window.removeEventListener('resize', onResize);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', resize);
       document.removeEventListener('mouseleave', handleMouseLeave);
       themeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);

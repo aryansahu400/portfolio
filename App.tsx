@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
-import { Cpu, Mail, ArrowRight, Linkedin, Github, Award, ChevronRight, Sun, Moon } from 'lucide-react';
+import { Mail, ArrowRight, Linkedin, Github, Award, ChevronRight, Sun, Moon, Menu, X } from 'lucide-react';
 import GridBackground from './components/GridBackground';
 import { PERSONAL_DATA, NAV_ITEMS, EXPERTISE, CAREER, PROJECTS, ACHIEVEMENTS } from './constants';
 import { useExperienceTimer } from "./hooks/useExperienceTimer";
@@ -11,10 +11,14 @@ const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [typedText, setTypedText] = useState('');
+  const [activeSkill, setActiveSkill] = useState<number | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('');
   const [theme, setTheme] = useState<'light' | 'dark'>(
     typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light'
   );
   const experienceTime = useExperienceTimer();
+  const lenisRef = useRef<Lenis | null>(null);
 
   const toggleTheme = () => {
     setTheme(prev => {
@@ -28,31 +32,46 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    // Buttery-smooth, continuous (infinite-loop) scrolling
-    const lenis = new Lenis({
-      lerp: 0.1,
-      infinite: true,
-      syncTouch: true,
-      anchors: true,
-      autoRaf: true,
-    });
-    lenis.on('scroll', () => setScrolled(lenis.scroll > 50));
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Buttery-smooth, continuous (infinite-loop) scrolling. Disabled for reduced motion.
+    let lenis: Lenis | null = null;
+    const handleNativeScroll = () => setScrolled(window.scrollY > 50);
+    if (reduce) {
+      window.addEventListener('scroll', handleNativeScroll);
+    } else {
+      const l = new Lenis({
+        lerp: 0.1,
+        infinite: true,
+        syncTouch: true,
+        anchors: true,
+        autoRaf: true,
+      });
+      l.on('scroll', () => setScrolled(l.scroll > 50));
+      lenisRef.current = l;
+      lenis = l;
+    }
 
     const timeInterval = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString());
     }, 1000);
 
-    // Typing effect logic
+    // Typing effect (instant when reduced motion is preferred)
     const summary = PERSONAL_DATA.summary;
-    let i = 0;
-    const typingInterval = setInterval(() => {
-      if (i < summary.length) {
-        setTypedText(summary.slice(0, i + 1));
-        i++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 20);
+    let typingInterval: ReturnType<typeof setInterval> | undefined;
+    if (reduce) {
+      setTypedText(summary);
+    } else {
+      let i = 0;
+      typingInterval = setInterval(() => {
+        if (i < summary.length) {
+          setTypedText(summary.slice(0, i + 1));
+          i++;
+        } else if (typingInterval) {
+          clearInterval(typingInterval);
+        }
+      }, 20);
+    }
 
     // Intersection Observer for reveals
     const observer = new IntersectionObserver((entries) => {
@@ -64,20 +83,60 @@ const App: React.FC = () => {
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     return () => {
-      lenis.destroy();
+      lenis?.destroy();
+      lenisRef.current = null;
+      window.removeEventListener('scroll', handleNativeScroll);
       clearInterval(timeInterval);
-      clearInterval(typingInterval);
+      if (typingInterval) clearInterval(typingInterval);
       observer.disconnect();
     };
+  }, []);
+
+  // Close the active skill panel on Escape or a click outside the skills grid.
+  useEffect(() => {
+    if (activeSkill === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActiveSkill(null);
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      if (!(e.target as HTMLElement).closest('#skills')) setActiveSkill(null);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [activeSkill]);
+
+  // Scrollspy: subtly highlight the nav item for the section currently in view.
+  useEffect(() => {
+    const ids = ['home', 'skills', 'experience', 'projects', 'achievements', 'contact'];
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (sections.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        });
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+    );
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
   }, []);
 
   // Hero is rendered twice: once at the top (with #home + reveal animation) and
   // once after the footer as the seamless wrap target for the infinite loop.
   // The clone has no id, is aria-hidden, and skips the reveal animation so it
   // matches the already-revealed real hero for a pixel-clean loop seam.
-  const renderHero = (clone = false) => (
+  const renderHero = (clone = false) => {
+    const Heading: React.ElementType = clone ? 'div' : 'h1';
+    return (
     <section
-      {...(clone ? { 'aria-hidden': true } : { id: 'home' })}
+      {...(clone ? ({ 'aria-hidden': true, inert: true } as any) : { id: 'home' })}
       className="min-h-screen flex flex-col justify-center relative px-6 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto w-full pt-24 grid lg:grid-cols-2 gap-12 items-center">
@@ -87,9 +146,9 @@ const App: React.FC = () => {
             Bhopal, IN
           </div>
 
-          <h1 className="text-5xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9] text-slate-900 dark:text-slate-100">
+          <Heading className="text-5xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9] text-slate-900 dark:text-slate-100">
             Developing <span className="text-blue-600 dark:text-blue-400">Scalable</span> Realities.
-          </h1>
+          </Heading>
 
           <div className="mono text-slate-500 dark:text-slate-400 text-lg mb-10 max-w-xl">
             <span className="typing-cursor">{typedText}</span>
@@ -211,7 +270,8 @@ const App: React.FC = () => {
         </div>
       </div>
     </section>
-  );
+    );
+  };
 
   const renderDivider = () => (
     <div className="mx-auto w-[70%] h-px bg-slate-200 dark:bg-slate-800" />
@@ -224,7 +284,7 @@ const App: React.FC = () => {
       {/* Navigation */}
       <nav id="navbar" className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 dark:bg-black/80 backdrop-blur-xl py-4 border-b border-slate-200 dark:border-slate-800' : 'py-6 border-b border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+          <div className="flex items-center gap-4 group cursor-pointer" onClick={() => (lenisRef.current ? lenisRef.current.scrollTo(0) : window.scrollTo(0, 0))}>
             <div className="w-10 h-10 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-900 dark:text-slate-100 font-bold text-lg mono relative overflow-hidden">
               AS
               <div className="absolute inset-0 bg-slate-900/5 dark:bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
@@ -237,11 +297,19 @@ const App: React.FC = () => {
           
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center space-x-10">
-              {NAV_ITEMS.map((item, idx) => (
-                <a key={idx} href={item.href} className="mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
-                  {item.label}
-                </a>
-              ))}
+              {NAV_ITEMS.map((item, idx) => {
+                const isActive = activeSection !== '' && item.href === `#${activeSection}`;
+                return (
+                  <a
+                    key={idx}
+                    href={item.href}
+                    aria-current={isActive ? 'true' : undefined}
+                    className={`mono text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${isActive ? 'text-slate-900 dark:text-white [text-shadow:0_0_10px_rgba(37,99,235,0.4)] dark:[text-shadow:0_0_10px_rgba(96,165,250,0.45)]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                  >
+                    {item.label}
+                  </a>
+                );
+              })}
               <a href="#contact" className="px-5 py-2 border border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 mono text-[10px] font-bold uppercase hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-all">Connect</a>
             </div>
 
@@ -249,11 +317,45 @@ const App: React.FC = () => {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <button className="md:hidden text-slate-900 dark:text-slate-100 p-2">
-              <Cpu className="w-5 h-5" />
+            <button
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+              className="md:hidden text-slate-900 dark:text-slate-100 p-2"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
+
+        {mobileMenuOpen && (
+          <div id="mobile-menu" className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-black/95 backdrop-blur-xl">
+            <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col">
+              {NAV_ITEMS.map((item, idx) => {
+                const isActive = activeSection !== '' && item.href === `#${activeSection}`;
+                return (
+                  <a
+                    key={idx}
+                    href={item.href}
+                    aria-current={isActive ? 'true' : undefined}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`mono text-xs font-bold uppercase tracking-[0.2em] py-3 transition-colors ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}
+                  >
+                    {item.label}
+                  </a>
+                );
+              })}
+              <a
+                href="#contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-3 px-5 py-3 border border-slate-900 dark:border-slate-100 text-center text-slate-900 dark:text-slate-100 mono text-[10px] font-bold uppercase hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-all"
+              >
+                Connect
+              </a>
+            </div>
+          </div>
+        )}
       </nav>
 
       <main>
@@ -275,11 +377,32 @@ const App: React.FC = () => {
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-              {EXPERTISE.map((skill, idx) => (
-                <div key={idx} className="p-4 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-800 group hover:border-slate-400 dark:hover:border-slate-600 transition-all cursor-default">
-                  <div className="text-[10px] mono text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">{skill}</div>
-                </div>
-              ))}
+              {EXPERTISE.map((skill, idx) => {
+                const active = activeSkill === idx;
+                return (
+                  <button
+                    type="button"
+                    key={idx}
+                    className="group relative text-left w-full"
+                    aria-expanded={active}
+                    aria-describedby={`skill-panel-${idx}`}
+                    onClick={() => setActiveSkill(active ? null : idx)}
+                  >
+                    <div className={`p-4 bg-slate-50 dark:bg-white/5 border transition-all duration-200 cursor-pointer group-hover:-translate-y-0.5 group-hover:border-slate-400 dark:group-hover:border-slate-600 ${active ? 'border-slate-400 dark:border-slate-600' : 'border-slate-200 dark:border-slate-800'}`}>
+                      <div className="text-[10px] mono text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">{skill.name}</div>
+                    </div>
+                    <div
+                      id={`skill-panel-${idx}`}
+                      role="tooltip"
+                      onClick={(e) => e.stopPropagation()}
+                      className={`absolute left-1/2 top-full z-30 mt-3 w-80 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 origin-top rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/10 dark:shadow-black/40 transition-all duration-200 ${active ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'} group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100`}
+                    >
+                      <div className="mono text-xs font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wider">{skill.name}</div>
+                      <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{skill.usage}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </section>

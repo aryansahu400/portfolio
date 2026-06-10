@@ -18,12 +18,33 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Impact', href: '#achievements' }
 ];
 
+// Each skill has a `usage` blurb shown on hover in the Core Competencies grid.
+// EDIT THE `usage` TEXT BELOW to change what's revealed for each skill.
 export const EXPERTISE = [
-  "Java", "Spring Boot", "Spring Security","Spring Webflux","Spring Gateway", "Spring AI", "MCP Servers", "Quartz Scheduler",
-  "SSO","OAuth 2","OIDC","SAML", "RBAC", "ABAC",
-  "Hibernate", "Hikari","Postgres","Vertica", "Redis", "Kafka",  
-  "Git", "Duck-DB","Azure blob", "AWS SES"
-  
+  { name: "Java", usage: "Primary language across the API Gateway, Lumenore Studio, and the workflow automation engine." },
+  { name: "Spring Boot", usage: "Foundation of every microservice I've shipped — Gateway, Media, Notifications, and Lumenore Studio." },
+  { name: "Spring Security", usage: "Secured the platform with SSO, JWT sessions, and fine-grained role-based access." },
+  { name: "Spring Webflux", usage: "Built the reactive Notification module with non-blocking Server-Sent Events (SSE)." },
+  { name: "Spring Gateway", usage: "Designed the API Gateway routing traffic and centralizing auth/audit for all services." },
+  { name: "Spring AI", usage: "Powers the AI-driven nodes inside the Lumenore Studio workflow engine." },
+  { name: "MCP Servers", usage: "Wired MCP servers so workflows can call AI tools and external context." },
+  { name: "Quartz Scheduler", usage: "Schedules recurring jobs and time-based workflow triggers." },
+  { name: "SSO", usage: "Implemented enterprise single sign-on (Apple, Google, Microsoft) for Lumenore Studio." },
+  { name: "OAuth 2", usage: "Underlies the token exchange and authorization flows in the auth system." },
+  { name: "OIDC", usage: "Federates identity with external providers in the SSO layer." },
+  { name: "SAML", usage: "Enabled enterprise SAML logins for tenant organizations." },
+  { name: "RBAC", usage: "Enforces role-based access control across the multi-tenant platform." },
+  { name: "ABAC", usage: "Adds attribute-based rules for context-aware, fine-grained permissions." },
+  { name: "Hibernate", usage: "ORM for the transactional data layer across services." },
+  { name: "Hikari", usage: "Tuned the HikariCP pool for high-throughput database access." },
+  { name: "Postgres", usage: "Primary relational store for application and tenant data." },
+  { name: "Vertica", usage: "Columnar warehouse for large-scale analytical queries." },
+  { name: "Redis", usage: "Backs JWT session management and caching at the Gateway." },
+  { name: "Kafka", usage: "Streams real-time activity events for audit and monitoring." },
+  { name: "Git", usage: "Version control and code review across all projects." },
+  { name: "Duck-DB", usage: "Embedded, in-process analytics for fast data crunching." },
+  { name: "Azure blob", usage: "Object storage powering enterprise media and file management." },
+  { name: "AWS SES", usage: "Transactional email delivery for the Notification module." },
 ];
 
 export const CAREER: CareerItem[] = [
