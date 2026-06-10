@@ -12,6 +12,7 @@ const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [typedText, setTypedText] = useState('');
   const [activeSkill, setActiveSkill] = useState<number | null>(null);
+  const [isTouch, setIsTouch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
   const [theme, setTheme] = useState<'light' | 'dark'>(
@@ -92,7 +93,12 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Close the active skill panel on Escape or a click outside the skills grid.
+  // Touch (no-hover) devices use tap to reveal the skill panel instead of hover.
+  useEffect(() => {
+    setIsTouch(window.matchMedia('(hover: none)').matches);
+  }, []);
+
+  // On touch, close the open skill panel on Escape or a tap outside the grid.
   useEffect(() => {
     if (activeSkill === null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -383,19 +389,19 @@ const App: React.FC = () => {
                   <button
                     type="button"
                     key={idx}
-                    className="group relative text-left w-full"
-                    aria-expanded={active}
                     aria-describedby={`skill-panel-${idx}`}
-                    onClick={() => setActiveSkill(active ? null : idx)}
+                    aria-expanded={active}
+                    onClick={() => { if (isTouch) setActiveSkill(active ? null : idx); }}
+                    className={`group relative text-left w-full ${isTouch ? 'cursor-pointer' : 'cursor-default'}`}
                   >
-                    <div className={`p-4 bg-slate-50 dark:bg-white/5 border transition-all duration-200 cursor-pointer group-hover:-translate-y-0.5 group-hover:border-slate-400 dark:group-hover:border-slate-600 ${active ? 'border-slate-400 dark:border-slate-600' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <div className={`p-4 bg-slate-50 dark:bg-white/5 border transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-slate-400 dark:group-hover:border-slate-600 group-focus-visible:border-slate-400 dark:group-focus-visible:border-slate-600 ${active ? 'border-slate-400 dark:border-slate-600' : 'border-slate-200 dark:border-slate-800'}`}>
                       <div className="text-[10px] mono text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">{skill.name}</div>
                     </div>
                     <div
                       id={`skill-panel-${idx}`}
                       role="tooltip"
                       onClick={(e) => e.stopPropagation()}
-                      className={`absolute left-1/2 top-full z-30 mt-3 w-80 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 origin-top rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/10 dark:shadow-black/40 transition-all duration-200 ${active ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'} group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100`}
+                      className={`absolute left-1/2 top-1/2 z-30 w-80 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 -translate-y-1/2 origin-center rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/10 dark:shadow-black/40 transition-all duration-200 ${active ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'} group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100`}
                     >
                       <div className="mono text-xs font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wider">{skill.name}</div>
                       <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{skill.usage}</p>
