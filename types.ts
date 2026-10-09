@@ -22,3 +22,14 @@ export interface AchievementItem {
   title: string;
   detail: string;
 }
+
+export interface EducationItem {
+  institution: string;
+  degree: string;
+  period: string;
+}
+
+export interface CertificationItem {
+  title: string;
+  issuer: string;
+}

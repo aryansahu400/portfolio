@@ -1,9 +1,11 @@
 
-import { NavItem, CareerItem, ProjectItem, AchievementItem } from './types';
+import { NavItem, CareerItem, ProjectItem, AchievementItem, EducationItem, CertificationItem } from './types';
 
 export const PERSONAL_DATA = {
   name: "Aryan Sahu",
-  summary: "Specializing in high-performance backend systems and low-code platform engineering. Passionate about security, scalable architecture, and long-term maintainability.",
+  title: "Senior Software Engineer",
+  location: "Bhopal, IN",
+  summary: "Senior Software Engineer building a multi-tenant, AI-powered workflow platform and secure, high-performance Java backends. Passionate about security, scalable architecture, and long-term maintainability.",
   email: "aryansahu400@gmail.com",
   professionalEmail: "contact@aryaura.in",
   linkedin: "linkedin.com/in/aryansahu400",
@@ -14,8 +16,10 @@ export const PERSONAL_DATA = {
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Expertise', href: '#skills' },
   { label: 'Trajectory', href: '#experience' },
+  { label: 'Education', href: '#education' },
   { label: 'Craft', href: '#projects' },
-  { label: 'Impact', href: '#achievements' }
+  { label: 'Impact', href: '#achievements' },
+  { label: 'Credentials', href: '#certifications' }
 ];
 
 // Each skill has a `usage` blurb shown on hover in the Core Competencies grid.
@@ -50,19 +54,32 @@ export const EXPERTISE = [
 export const CAREER: CareerItem[] = [
   {
     company: "Lumenore (Netlink Pvt. Ltd.)",
-    role: "Software Engineer",
-    period: "08/2025 - Present",
+    role: "Senior Software Engineer",
+    period: "09/2026 - Present",
     desc: [
-      "Architected and delivered Lumenore Studio, a multi-tenant, multi-application low-code platform for building production-ready apps via drag-and-drop — serving [N] tenants and [M]+ users.",
-      "Engineered a workflow automation server on an extensible, node-based execution engine with 25+ node types (SQL, JavaScript, email, SMS, telephony, cookie management, AI-driven actions, and more).",
-      "Designed a flexible data management layer that lets users connect their own databases or use a managed built-in datastore.",
-      "Built a complete authentication and session layer with enterprise SSO (Apple, Google, Microsoft), end-to-end activity logging, and audit-ready traceability."
+      "Own the end-to-end design and backend development of a multi-tenant, AI-powered workflow and connection management platform — architecture, core services, security, integrations, and execution infrastructure.",
+      "Designed and built a workflow execution engine supporting AI/LLM completions, conversational chat memory, document processing, SQL execution, JavaScript expressions, email/SMS/voice communication, cookie management, and dynamic workflow execution.",
+      "Built an AI Agent that generates workflows from natural-language instructions, with Human-in-the-Loop (HITL), chat memory, and AI-driven workflow orchestration, plus configurable AI nodes that bring LLM-powered capabilities into workflows.",
+      "Implemented workflow versioning, rollback/revert, and execution management for safe workflow evolution and restoration.",
+      "Architected a multi-tenant connection management backend that automatically provisions a dedicated Vertica schema and database user for every tenant, ensuring strict tenant isolation.",
+      "Built secure backend services for DDL/DML operations and direct SQL execution against tenant-specific connections, with authorization, validation, and tenant-isolation controls that prevent unauthorized or cross-tenant database access.",
+      "Designed and implemented OIDC-based SSO with Google, Microsoft, Apple, and LinkedIn, along with tenant-aware authentication and authorization."
+    ]
+  },
+  {
+    company: "Lumenore (Netlink Pvt. Ltd.)",
+    role: "Software Engineer",
+    period: "10/2025 - 09/2026",
+    desc: [
+      "Owned the architecture, core services, security, and integrations of a multi-tenant, AI-powered workflow and connection management platform.",
+      "Built the workflow execution engine behind AI/LLM completions, chat memory, SQL, JavaScript, email/SMS/voice, and cookie management.",
+      "Implemented OIDC-based SSO with Google, Microsoft, Apple, and LinkedIn."
     ]
   },
   {
     company: "Lumenore (Netlink Pvt. Ltd.)",
     role: "Associate Software Engineer",
-    period: "08/2024 - 07/2025",
+    period: "08/2024 - 09/2025",
     desc: [
       "Developed a Gateway Server to manage traffic and facilitate microservice communication with Auth/Audit functionalities.",
       "Implemented robust session management using JWTs and Redis, utilizing Kafka for real-time activity monitoring.",
@@ -73,7 +90,7 @@ export const CAREER: CareerItem[] = [
   {
     company: "Lumenore (Netlink Pvt. Ltd.)",
     role: "Trainee",
-    period: "05/2023 - 07/2024",
+    period: "06/2023 - 07/2024",
     desc: [
       "Engineered a Migration API for seamless data transfer of no-code apps built by the Lumenore App Builder.",
       "Built a Media Module with SFTP integration for efficient enterprise-level file management.",
@@ -81,13 +98,22 @@ export const CAREER: CareerItem[] = [
     ]
   },
   {
-    company: "Netlink Software Group America",
-    role: "Software Engineering Intern",
+    company: "Netlink Software Group America Inc",
+    role: "Intern",
     period: "03/2023 - 05/2023",
     desc: [
       "Conducted in-depth analysis and troubleshooting of REST APIs for user registration, reviewing 3500+ lines of code.",
       "Enhanced code maintainability of the user authentication module by refactoring 1200+ lines of legacy Java code.",
-      "Improved system security through strategic flow modifications in the authentication pipeline."
+      "Improved system security through strategic flow modifications in the authentication pipeline.",
+      "Compiled an inventory of the Java-based public endpoints and built a Postman collection covering them and their payloads."
+    ]
+  },
+  {
+    company: "Abhi and Aish Infotech Pvt. Ltd.",
+    role: "Core Java Intern",
+    period: "02/2023 - 03/2023",
+    desc: [
+      "Completed a 45-day Core Java internship, deepening my understanding of the application development process and applying Core Java concepts in practice."
     ]
   }
 ];
@@ -126,4 +152,17 @@ export const ACHIEVEMENTS: AchievementItem[] = [
   { title: "HackerRank 6-Star", detail: "Problem Solving & C++ specialist badge." },
   { title: "IYI World 3rd", detail: "Global recognition for Young Inventors 2018." },
   { title: "Sage Coding #1", detail: "First prize in Engineer's Day coding contest." }
+];
+
+export const EDUCATION: EducationItem[] = [
+  { institution: "SAGE University Bhopal", degree: "Bachelor of Technology, Computer Engineering", period: "08/2020 - 08/2024" },
+  { institution: "Canyon Higher Secondary School", degree: "PCM", period: "2005 - 2020" }
+];
+
+export const CERTIFICATIONS: CertificationItem[] = [
+  { title: "IYI Bronze Award", issuer: "International Exhibition for Young Inventors, 2018" },
+  { title: "IEEE Project Presentation Runner-up", issuer: "IEEE CCET 2022" },
+  { title: "TCS NQT Attitudinal Alignment", issuer: "TCS NQT" },
+  { title: "Canyon Outstanding Performer", issuer: "Canyon" },
+  { title: "Microsoft AI Classroom Series", issuer: "Microsoft" }
 ];

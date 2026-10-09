@@ -2,9 +2,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
-import { Mail, ArrowRight, Linkedin, Github, Award, ChevronRight, Sun, Moon, Menu, X } from 'lucide-react';
+import { Mail, ArrowRight, Linkedin, Github, Award, GraduationCap, ChevronRight, Sun, Moon, Menu, X } from 'lucide-react';
 import GridBackground from './components/GridBackground';
-import { PERSONAL_DATA, NAV_ITEMS, EXPERTISE, CAREER, PROJECTS, ACHIEVEMENTS } from './constants';
+import { PERSONAL_DATA, NAV_ITEMS, EXPERTISE, CAREER, PROJECTS, ACHIEVEMENTS, EDUCATION, CERTIFICATIONS } from './constants';
 import { useExperienceTimer } from "./hooks/useExperienceTimer";
 
 const App: React.FC = () => {
@@ -117,7 +117,7 @@ const App: React.FC = () => {
 
   // Scrollspy: subtly highlight the nav item for the section currently in view.
   useEffect(() => {
-    const ids = ['home', 'skills', 'experience', 'projects', 'achievements', 'contact'];
+    const ids = ['home', 'skills', 'experience', 'education', 'projects', 'achievements', 'certifications', 'contact'];
     const sections = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
@@ -147,9 +147,9 @@ const App: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto w-full pt-24 grid lg:grid-cols-2 gap-12 items-center">
         <div className={clone ? undefined : 'reveal'}>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-white/5 text-[10px] mono font-bold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-white/5 text-[10px] mono font-bold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-8">
             <span className="w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full animate-pulse"></span>
-            Bhopal, IN
+            <span>{PERSONAL_DATA.title} <span className="whitespace-nowrap">· {PERSONAL_DATA.location}</span></span>
           </div>
 
           <Heading className="text-5xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9] text-slate-900 dark:text-slate-100">
@@ -302,7 +302,7 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center space-x-10">
+            <div className="hidden lg:flex items-center space-x-6 xl:space-x-10">
               {NAV_ITEMS.map((item, idx) => {
                 const isActive = activeSection !== '' && item.href === `#${activeSection}`;
                 return (
@@ -328,7 +328,7 @@ const App: React.FC = () => {
               aria-label="Toggle menu"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu"
-              className="md:hidden text-slate-900 dark:text-slate-100 p-2"
+              className="lg:hidden text-slate-900 dark:text-slate-100 p-2"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -336,7 +336,7 @@ const App: React.FC = () => {
         </div>
 
         {mobileMenuOpen && (
-          <div id="mobile-menu" className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-black/95 backdrop-blur-xl">
+          <div id="mobile-menu" className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-black/95 backdrop-blur-xl">
             <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col">
               {NAV_ITEMS.map((item, idx) => {
                 const isActive = activeSection !== '' && item.href === `#${activeSection}`;
@@ -450,6 +450,30 @@ const App: React.FC = () => {
 
         {renderDivider()}
 
+        {/* Education Section */}
+        <section id="education" className="py-32 reveal">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="mb-20">
+              <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Foundations</h2>
+              <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">Academic Background</h3>
+            </div>
+            <div className="grid md:grid-cols-2 gap-8">
+              {EDUCATION.map((edu, idx) => (
+                <div key={idx} className="p-10 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors group">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="text-[10px] mono text-blue-600 dark:text-blue-400 font-bold uppercase tracking-[0.2em]">{edu.period}</div>
+                    <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400 opacity-60 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-6 leading-tight">{edu.institution}</h3>
+                  <div className="inline-block px-3 py-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-800 mono text-[10px] text-slate-600 dark:text-slate-400">{edu.degree}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {renderDivider()}
+
         {/* Projects Section */}
         <section id="projects" className="py-32 reveal">
           <div className="max-w-7xl mx-auto px-6">
@@ -489,6 +513,27 @@ const App: React.FC = () => {
                   <div className="mono text-blue-600 dark:text-blue-400 mb-4 opacity-60 group-hover:opacity-100 transition-opacity"><Award className="w-5 h-5" /></div>
                   <div className="text-slate-900 dark:text-slate-100 font-bold mb-2 text-sm uppercase tracking-tight">{a.title}</div>
                   <div className="text-[10px] mono text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300">{a.detail}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {renderDivider()}
+
+        {/* Certifications Section */}
+        <section id="certifications" className="py-32 reveal">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="mb-20">
+              <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Credentials</h2>
+              <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">Certifications &amp; Honors</h3>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {CERTIFICATIONS.map((c, idx) => (
+                <div key={idx} className="p-6 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-all group">
+                  <div className="mono text-blue-600 dark:text-blue-400 mb-4 opacity-60 group-hover:opacity-100 transition-opacity"><Award className="w-5 h-5" /></div>
+                  <div className="text-slate-900 dark:text-slate-100 font-bold mb-2 text-sm uppercase tracking-tight">{c.title}</div>
+                  <div className="text-[10px] mono text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300">{c.issuer}</div>
                 </div>
               ))}
             </div>
