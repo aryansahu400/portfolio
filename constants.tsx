@@ -14,11 +14,11 @@ export const PERSONAL_DATA = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
+  { label: 'Experience', href: '#experience' },
+  { label: 'Projects', href: '#projects' },
   { label: 'Expertise', href: '#skills' },
-  { label: 'Trajectory', href: '#experience' },
   { label: 'Education', href: '#education' },
-  { label: 'Craft', href: '#projects' },
-  { label: 'Impact', href: '#achievements' },
+  { label: 'Milestones', href: '#achievements' },
   { label: 'Credentials', href: '#certifications' }
 ];
 

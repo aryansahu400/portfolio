@@ -10,7 +10,33 @@
   <meta property="og:title" content="Aryan Sahu | Senior Software Engineer">
   <meta property="og:description" content="Aryan Sahu is a Senior Software Engineer building a multi-tenant, AI-powered workflow platform and secure, high-performance Java backends.">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class', future: { hoverOnlyWhenSupported: true } };</script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      future: { hoverOnlyWhenSupported: true },
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+          },
+          colors: {
+            paper: 'var(--paper)',
+            'paper-2': 'var(--paper-2)',
+            ink: 'var(--ink)',
+            muted: 'var(--muted)',
+            rule: 'var(--rule)',
+            accent: 'var(--accent)',
+            'code-kw': 'var(--code-kw)',
+            'code-type': 'var(--code-type)',
+            'code-str': 'var(--code-str)',
+            'code-method': 'var(--code-method)'
+          }
+        }
+      }
+    };
+  </script>
   <script>
     (function () {
       try {
@@ -21,49 +47,63 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff;
-      --accent: #2563eb;
-      --accent-dim: rgba(37, 99, 235, 0.10);
-      --border: rgba(15, 23, 42, 0.08);
-    }
-
-    body {
-      background-color: var(--bg);
-      color: #0f172a;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      overflow-x: hidden;
-    }
-
-    .mono { font-family: 'JetBrains Mono', monospace; }
-
-    .glass {
-      background: rgba(15, 23, 42, 0.02);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
+      --paper: #F6F3EE;
+      --paper-2: #EFEBE3;
+      --ink: #1B1B1B;
+      --muted: #6B655C;
+      --rule: rgba(27, 27, 27, 0.14);
+      --rule-2: rgba(27, 27, 27, 0.30);
+      --accent: #B73D0A;
+      --code-kw: #7C3A9E;
+      --code-type: #8F5A06;
+      --code-str: #44700D;
+      --code-method: #1D5FA8;
     }
 
     .dark {
-      --bg: #0a0a0a;
-      --accent: #60a5fa;
-      --accent-dim: rgba(96, 165, 250, 0.12);
-      --border: rgba(255, 255, 255, 0.08);
+      --paper: #141210;
+      --paper-2: #1D1A16;
+      --ink: #EDE8DF;
+      --muted: #A39B8E;
+      --rule: rgba(237, 232, 223, 0.16);
+      --rule-2: rgba(237, 232, 223, 0.32);
+      --accent: #F08A5D;
+      --code-kw: #C4A1F0;
+      --code-type: #E8B64C;
+      --code-str: #8FC773;
+      --code-method: #7FB2F0;
     }
 
-    .dark body { color: #f1f5f9; }
+    html { color-scheme: light; }
+    html.dark { color-scheme: dark; }
 
-    .dark .glass { background: rgba(255, 255, 255, 0.04); }
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-    .dark ::-webkit-scrollbar-track { background: #18181b; }
-    .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
-    .dark ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--paper); }
+    ::-webkit-scrollbar-thumb { background: var(--rule-2); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
     .reveal {
       opacity: 0;
       transform: translateY(20px);
-      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .reveal.active {
@@ -71,24 +111,8 @@
       transform: translateY(0);
     }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-    .typing-cursor::after {
-      content: '|';
-      animation: blink 1s infinite;
-      color: var(--accent);
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
-      .typing-cursor::after { animation: none; }
     }
   </style>
 <script type="importmap">
@@ -102,7 +126,7 @@
 }
 </script>
 </head>
-<body class="selection:bg-blue-600 selection:text-white dark:selection:bg-blue-400 dark:selection:text-slate-950">
+<body class="selection:bg-accent selection:text-paper">
   <div id="root"></div>
 <script type="module" src="/index.tsx"></script>
 </body>

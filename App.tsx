@@ -2,15 +2,47 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
-import { Mail, ArrowRight, Linkedin, Github, Award, GraduationCap, ChevronRight, Sun, Moon, Menu, X } from 'lucide-react';
-import GridBackground from './components/GridBackground';
+import { ArrowUpRight, Sun, Moon, Menu, X } from 'lucide-react';
+import CodeCard from './components/CodeCard';
 import { PERSONAL_DATA, NAV_ITEMS, EXPERTISE, CAREER, PROJECTS, ACHIEVEMENTS, EDUCATION, CERTIFICATIONS } from './constants';
-import { useExperienceTimer } from "./hooks/useExperienceTimer";
+import { useExperienceTimer } from './hooks/useExperienceTimer';
+
+const SECTION_IDS = ['home', 'experience', 'projects', 'skills', 'education', 'achievements', 'certifications', 'contact'];
+
+const LABEL = 'text-[11px] uppercase tracking-[0.18em] text-muted';
+const TEXT_LINK = 'border-b border-ink pb-0.5 transition-colors hover:border-accent hover:text-accent';
+
+interface SectionProps {
+  id: string;
+  index: string;
+  label: string;
+  title: React.ReactNode;
+  meta?: string;
+  children: React.ReactNode;
+}
+
+// Shared editorial section frame: a numbered label column beside a serif headline and content.
+const Section: React.FC<SectionProps> = ({ id, index, label, title, meta, children }) => (
+  <section id={id} aria-labelledby={`${id}-title`} className="reveal border-t border-rule overflow-x-clip">
+    <div className="max-w-6xl mx-auto px-6 py-24 md:py-32 grid lg:grid-cols-[200px_1fr] gap-x-16 gap-y-8">
+      <div className="lg:sticky lg:top-28 self-start">
+        <div className={`${LABEL} tabular-nums`}>
+          <span className="text-accent">{index}</span> — {label}
+        </div>
+        {meta && <div className="mt-2 text-[12px] text-muted tabular-nums">{meta}</div>}
+      </div>
+      <div>
+        <h2 id={`${id}-title`} className="font-serif font-normal text-4xl md:text-6xl leading-[1.02] tracking-tight mb-12 md:mb-16">
+          {title}
+        </h2>
+        {children}
+      </div>
+    </div>
+  </section>
+);
 
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-  const [typedText, setTypedText] = useState('');
   const [activeSkill, setActiveSkill] = useState<number | null>(null);
   const [isTouch, setIsTouch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -35,12 +67,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Buttery-smooth, continuous (infinite-loop) scrolling. Disabled for reduced motion.
+    // Smooth scrolling (disabled for reduced motion).
     let lenis: Lenis | null = null;
     const handleNativeScroll = () => setScrolled(window.scrollY > 50);
     if (reduce) {
       window.addEventListener('scroll', handleNativeScroll);
     } else {
+      // Buttery-smooth, continuous (infinite-loop) scrolling.
       const l = new Lenis({
         lerp: 0.1,
         infinite: true,
@@ -51,27 +84,6 @@ const App: React.FC = () => {
       l.on('scroll', () => setScrolled(l.scroll > 50));
       lenisRef.current = l;
       lenis = l;
-    }
-
-    const timeInterval = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString());
-    }, 1000);
-
-    // Typing effect (instant when reduced motion is preferred)
-    const summary = PERSONAL_DATA.summary;
-    let typingInterval: ReturnType<typeof setInterval> | undefined;
-    if (reduce) {
-      setTypedText(summary);
-    } else {
-      let i = 0;
-      typingInterval = setInterval(() => {
-        if (i < summary.length) {
-          setTypedText(summary.slice(0, i + 1));
-          i++;
-        } else if (typingInterval) {
-          clearInterval(typingInterval);
-        }
-      }, 20);
     }
 
     // Intersection Observer for reveals
@@ -87,8 +99,6 @@ const App: React.FC = () => {
       lenis?.destroy();
       lenisRef.current = null;
       window.removeEventListener('scroll', handleNativeScroll);
-      clearInterval(timeInterval);
-      if (typingInterval) clearInterval(typingInterval);
       observer.disconnect();
     };
   }, []);
@@ -115,10 +125,9 @@ const App: React.FC = () => {
     };
   }, [activeSkill]);
 
-  // Scrollspy: subtly highlight the nav item for the section currently in view.
+  // Scrollspy: underline the nav item for the section currently in view.
   useEffect(() => {
-    const ids = ['home', 'skills', 'experience', 'education', 'projects', 'achievements', 'certifications', 'contact'];
-    const sections = ids
+    const sections = SECTION_IDS
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
     if (sections.length === 0) return;
@@ -134,193 +143,100 @@ const App: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Hero is rendered twice: once at the top (with #home + reveal animation) and
-  // once after the footer as the seamless wrap target for the infinite loop.
-  // The clone has no id, is aria-hidden, and skips the reveal animation so it
-  // matches the already-revealed real hero for a pixel-clean loop seam.
+  // Keep a skill's magnified panel inside the viewport (it is centered over its tile).
+  const keepPanelOnScreen = (tile: HTMLElement) => {
+    const panel = tile.querySelector<HTMLElement>('[role="tooltip"]');
+    if (!panel) return;
+    const margin = 12;
+    const rect = tile.getBoundingClientRect();
+    const width = panel.offsetWidth;
+    const left = rect.left + rect.width / 2 - width / 2;
+    const shift = Math.max(margin - left, 0) - Math.max(left + width - (window.innerWidth - margin), 0);
+    panel.style.setProperty('translate', `${shift}px 0`);
+  };
+
+  const navLinkClass = (href: string, size: string) => {
+    const isActive = activeSection !== '' && href === `#${activeSection}`;
+    return `${size} uppercase tracking-[0.14em] font-medium pb-1 border-b transition-colors ${isActive ? 'text-ink border-accent' : 'text-muted border-transparent hover:text-ink'}`;
+  };
+
+  // The hero is rendered twice: once at the top (with #home and the reveal animation) and once
+  // after the footer as the wrap target for the infinite scroll. The clone has no id, is
+  // aria-hidden and inert, and skips the reveal so it matches the already-revealed hero and the
+  // wrap from the bottom back to the top has no visible seam.
   const renderHero = (clone = false) => {
     const Heading: React.ElementType = clone ? 'div' : 'h1';
     return (
-    <section
-      {...(clone ? ({ 'aria-hidden': true, inert: true } as any) : { id: 'home' })}
-      className="min-h-screen flex flex-col justify-center relative px-6 overflow-hidden"
-    >
-      <div className="max-w-7xl mx-auto w-full pt-24 grid lg:grid-cols-2 gap-12 items-center">
-        <div className={clone ? undefined : 'reveal'}>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-white/5 text-[10px] mono font-bold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-8">
-            <span className="w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full animate-pulse"></span>
-            <span>{PERSONAL_DATA.title} <span className="whitespace-nowrap">· {PERSONAL_DATA.location}</span></span>
-          </div>
-
-          <Heading className="text-5xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9] text-slate-900 dark:text-slate-100">
-            Developing <span className="text-blue-600 dark:text-blue-400">Scalable</span> Realities.
-          </Heading>
-
-          <div className="mono text-slate-500 dark:text-slate-400 text-lg mb-10 max-w-xl">
-            <span className="typing-cursor">{typedText}</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-6">
-            <a
-              href="#experience"
-              className="group relative px-8 py-5 w-[170px]
-                        bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold mono text-sm
-                        transition-all duration-300 transform hover:-translate-y-1"
-            >
-              <span className="absolute inset-0 flex items-center justify-center
-                              opacity-100 group-hover:opacity-0 transition-opacity duration-200">
-                &gt; TRAJECTORY
-              </span>
-
-              <span className="absolute inset-0 flex items-center justify-center
-                              opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                &gt; EXPERIENCE
-              </span>
-            </a>
-            <div className="flex items-center gap-6 text-slate-400 dark:text-slate-500">
-              <a href={`https://${PERSONAL_DATA.linkedin}`} target="_blank" rel="noreferrer" className="hover:text-blue-600 dark:hover:text-blue-400 transition-all"><Linkedin className="w-5 h-5" /></a>
-              <a href={`https://${PERSONAL_DATA.github}`} target="_blank" rel="noreferrer" className="hover:text-blue-600 dark:hover:text-blue-400 transition-all"><Github className="w-5 h-5" /></a>
-              <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-all"><Mail className="w-5 h-5" /></a>
+      <section
+        {...(clone ? ({ 'aria-hidden': true, inert: true } as any) : { id: 'home' })}
+        className="min-h-screen flex flex-col justify-center px-6 pt-32 pb-20"
+      >
+        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-x-12 gap-y-14 items-center">
+          <div className={clone ? undefined : 'reveal'}>
+            <div className={`inline-flex items-center gap-2.5 ${LABEL} mb-8`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" aria-hidden="true"></span>
+              <span>{PERSONAL_DATA.title} <span className="whitespace-nowrap">· {PERSONAL_DATA.location}</span></span>
             </div>
+
+            <Heading className="font-serif font-normal text-6xl md:text-7xl xl:text-8xl leading-[0.95] tracking-tight mb-8">
+              Developing <em className="italic text-accent">Scalable</em> Realities.
+            </Heading>
+
+            <p className="text-lg leading-relaxed text-muted max-w-xl mb-10">{PERSONAL_DATA.summary}</p>
+
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-sm">
+              <a href="#experience" className={`inline-flex items-center gap-1.5 font-medium ${TEXT_LINK}`}>
+                View experience <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              </a>
+              <div className="flex items-center gap-6">
+                <a href={`https://${PERSONAL_DATA.linkedin}`} target="_blank" rel="noreferrer" className="text-muted transition-colors hover:text-accent">LinkedIn</a>
+                <a href={`https://${PERSONAL_DATA.github}`} target="_blank" rel="noreferrer" className="text-muted transition-colors hover:text-accent">GitHub</a>
+                <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className="text-muted transition-colors hover:text-accent">Email</a>
+              </div>
+            </div>
+          </div>
+
+          <div className={clone ? 'min-w-0' : 'reveal min-w-0'} style={clone ? undefined : { transitionDelay: '200ms' }}>
+            <CodeCard elapsed={experienceTime} />
           </div>
         </div>
-
-        <div className={clone ? 'hidden lg:block relative' : 'hidden lg:block reveal relative'} style={{ transitionDelay: '200ms' }}>
-          <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-800 p-8 rounded-sm relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 mono text-[10px] text-slate-400 dark:text-slate-500">Java 21</div>
-            <div className="space-y-4 mono text-sm text-slate-800 dark:text-slate-200">
-              <div className="flex gap-4">
-                <span className="text-slate-400 dark:text-slate-500">01</span>
-                <span className="text-purple-600 dark:text-purple-400">final</span>
-                <span className="text-purple-600 dark:text-purple-400">class</span>
-                <span className="text-amber-600 dark:text-amber-400">Engineer</span> {'{'}
-              </div>
-
-              <div className="flex gap-4">
-                <span className="text-slate-400 dark:text-slate-500">02</span>
-                &nbsp;&nbsp;<span className="text-purple-600 dark:text-purple-400">private static final</span> String NAME =
-                <span className="text-emerald-600 dark:text-emerald-400">"Aryan Sahu"</span>;
-              </div>
-
-              <div className="flex gap-4">
-                <span className="text-slate-400 dark:text-slate-500">03</span>
-                &nbsp;&nbsp;<span className="text-purple-600 dark:text-purple-400">private</span> var expertise = <span className="text-amber-600 dark:text-amber-400">StackProfile</span>
-              </div>
-              <div className="flex gap-0">
-                <span className="text-slate-400 dark:text-slate-500">04</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.builder()
-              </div>
-
-              <div className="flex gap-0">
-                <span className="text-slate-400 dark:text-slate-500">05</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.frameworks(
-                <span className="text-emerald-600 dark:text-emerald-400">"Spring", "Hibernate"</span>)
-              </div>
-
-              <div className="flex gap-0">
-                <span className="text-slate-400 dark:text-slate-500">06</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.datastores(
-                <span className="text-emerald-600 dark:text-emerald-400">"PostgreSQL", "Redis", "Vertica"</span>)
-              </div>
-
-              <div className="flex gap-0">
-                <span className="text-slate-400 dark:text-slate-500">07</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.security(
-                <span className="text-emerald-600 dark:text-emerald-400">"Spring Security"</span>)
-              </div>
-
-               <div className="flex gap-0">
-                <span className="text-slate-400 dark:text-slate-500">08</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build();
-              </div>
-
-              <div className="flex gap-4">
-                <span className="text-slate-400 dark:text-slate-500">09</span>
-                &nbsp;&nbsp;<span className="text-purple-600 dark:text-purple-400">public</span>
-                <span className="text-amber-600 dark:text-amber-400">SystemState</span>
-                <span className="text-blue-600 dark:text-blue-400">architectSystems</span>() {'{'}
-              </div>
-
-              <div className="flex gap-0">
-                <span className="text-slate-400 dark:text-slate-500">10</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-purple-600 dark:text-purple-400">return</span>
-                &nbsp;&nbsp;<span className="text-amber-600 dark:text-amber-400">Architect</span>
-                .design(<span className="text-amber-600 dark:text-amber-400">ScalableSystems</span>.vNext())
-              </div>
-              <div className="flex gap-0">
-                <span className="text-slate-400 dark:text-slate-500">11</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.deploy();
-              </div>
-
-              <div className="flex gap-4">
-                <span className="text-slate-400 dark:text-slate-500">12</span>
-                &nbsp;&nbsp;{'}'}
-              </div>
-
-              <div className="flex gap-4">
-                <span className="text-slate-400 dark:text-slate-500">13</span>
-                {'}'}
-              </div>
-
-            </div>
-            <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 flex justify-between items-end">
-              <div>
-                <div className="text-[12px] mono text-slate-500 dark:text-slate-400 uppercase mb-1">Building solutions since</div>
-
-              </div>
-              <div className="flex items-center justify-center">
-                <div className="text-[15px] text-slate-900 dark:text-slate-100 font-bold">{experienceTime}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
     );
   };
 
-  const renderDivider = () => (
-    <div className="mx-auto w-[70%] h-px bg-slate-200 dark:bg-slate-800" />
-  );
-
   return (
-    <div className="min-h-screen">
-      <GridBackground />
+    <div className="min-h-screen bg-paper text-ink">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-ink focus:text-paper focus:px-4 focus:py-2 text-sm">
+        Skip to content
+      </a>
 
       {/* Navigation */}
-      <nav id="navbar" className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 dark:bg-black/80 backdrop-blur-xl py-4 border-b border-slate-200 dark:border-slate-800' : 'py-6 border-b border-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-4 group cursor-pointer" onClick={() => (lenisRef.current ? lenisRef.current.scrollTo(0) : window.scrollTo(0, 0))}>
-            <div className="w-10 h-10 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-900 dark:text-slate-100 font-bold text-lg mono relative overflow-hidden">
-              AS
-              <div className="absolute inset-0 bg-slate-900/5 dark:bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-            </div>
-            <div className="hidden sm:block">
-              <div className="text-[10px] mono text-blue-600 dark:text-blue-400 font-bold tracking-widest uppercase opacity-70">Aryaura</div>
-              <div className="text-sm font-extrabold tracking-tighter text-slate-900 dark:text-slate-100">{PERSONAL_DATA.name}</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center space-x-6 xl:space-x-10">
-              {NAV_ITEMS.map((item, idx) => {
+      <header id="navbar" className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 border-b ${scrolled || mobileMenuOpen ? 'bg-paper border-rule' : 'bg-transparent border-transparent'}`}>
+        <nav aria-label="Primary" className="max-w-6xl mx-auto px-6 h-[72px] flex justify-between items-center">
+          <a
+            href="#home"
+            onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); if (lenisRef.current) lenisRef.current.scrollTo(0); else window.scrollTo(0, 0); }}
+            className="flex flex-col leading-none"
+          >
+            <span className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.22em] text-accent">Aryaura</span>
+            <span className="font-serif text-2xl">{PERSONAL_DATA.name}</span>
+          </a>
+
+          <div className="flex items-center gap-5">
+            <div className="hidden lg:flex items-center gap-7">
+              {NAV_ITEMS.map((item) => {
                 const isActive = activeSection !== '' && item.href === `#${activeSection}`;
                 return (
-                  <a
-                    key={idx}
-                    href={item.href}
-                    aria-current={isActive ? 'true' : undefined}
-                    className={`mono text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${isActive ? 'text-slate-900 dark:text-white [text-shadow:0_0_10px_rgba(37,99,235,0.4)] dark:[text-shadow:0_0_10px_rgba(96,165,250,0.45)]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                  >
+                  <a key={item.href} href={item.href} aria-current={isActive ? 'true' : undefined} className={navLinkClass(item.href, 'text-[11px]')}>
                     {item.label}
                   </a>
                 );
               })}
-              <a href="#contact" className="px-5 py-2 border border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 mono text-[10px] font-bold uppercase hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-all">Connect</a>
+              <a href="#contact" className="px-4 py-2 border border-ink text-[11px] uppercase tracking-[0.14em] font-medium transition-colors hover:bg-ink hover:text-paper">Connect</a>
             </div>
 
-            <button onClick={toggleTheme} aria-label="Toggle theme" title="Toggle theme" className="p-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-900 dark:hover:border-slate-200 transition-colors">
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            <button onClick={toggleTheme} aria-label="Toggle theme" title="Toggle theme" className="p-2 text-muted hover:text-ink transition-colors">
+              {theme === 'dark' ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
             </button>
 
             <button
@@ -328,25 +244,25 @@ const App: React.FC = () => {
               aria-label="Toggle menu"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu"
-              className="lg:hidden text-slate-900 dark:text-slate-100 p-2"
+              className="lg:hidden p-2 text-ink"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
-        </div>
+        </nav>
 
         {mobileMenuOpen && (
-          <div id="mobile-menu" className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-black/95 backdrop-blur-xl">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col">
-              {NAV_ITEMS.map((item, idx) => {
+          <div id="mobile-menu" className="lg:hidden border-t border-rule bg-paper max-h-[calc(100dvh-73px)] overflow-y-auto overscroll-contain">
+            <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col">
+              {NAV_ITEMS.map((item) => {
                 const isActive = activeSection !== '' && item.href === `#${activeSection}`;
                 return (
                   <a
-                    key={idx}
+                    key={item.href}
                     href={item.href}
                     aria-current={isActive ? 'true' : undefined}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`mono text-xs font-bold uppercase tracking-[0.2em] py-3 transition-colors ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}
+                    className={`font-serif text-3xl py-2 transition-colors ${isActive ? 'text-accent' : 'text-ink hover:text-accent'}`}
                   >
                     {item.label}
                   </a>
@@ -355,226 +271,170 @@ const App: React.FC = () => {
               <a
                 href="#contact"
                 onClick={() => setMobileMenuOpen(false)}
-                className="mt-3 px-5 py-3 border border-slate-900 dark:border-slate-100 text-center text-slate-900 dark:text-slate-100 mono text-[10px] font-bold uppercase hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-all"
+                className="mt-5 px-5 py-3 border border-ink text-center text-[11px] uppercase tracking-[0.14em] font-medium transition-colors hover:bg-ink hover:text-paper"
               >
                 Connect
               </a>
             </div>
           </div>
         )}
-      </nav>
+      </header>
 
-      <main>
-        {/* Hero Section */}
+      <main id="main">
+        {/* Hero */}
         {renderHero(false)}
 
-        {renderDivider()}
-
-        {/* Expertise Section */}
-        <section id="skills" className="py-32 relative reveal">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid md:grid-cols-2 gap-12 mb-20">
-              <div>
-                <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Core Competencies</h2>
-                <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight">Optimized for <br/>High-Load Environments.</h3>
-              </div>
-              <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed pt-10">
-                Specializing in high-performance backend systems. Expert in Java and modern reactive frameworks, focused on building secure, compliant, and horizontally scalable cloud architectures.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-              {EXPERTISE.map((skill, idx) => {
-                const active = activeSkill === idx;
-                return (
-                  <button
-                    type="button"
-                    key={idx}
-                    aria-describedby={`skill-panel-${idx}`}
-                    aria-expanded={active}
-                    onClick={() => { if (isTouch) setActiveSkill(active ? null : idx); }}
-                    className={`group relative text-left w-full ${isTouch ? 'cursor-pointer' : 'cursor-default'}`}
-                  >
-                    <div className={`p-4 bg-slate-50 dark:bg-white/5 border transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-slate-400 dark:group-hover:border-slate-600 group-focus-visible:border-slate-400 dark:group-focus-visible:border-slate-600 ${active ? 'border-slate-400 dark:border-slate-600' : 'border-slate-200 dark:border-slate-800'}`}>
-                      <div className="text-[10px] mono text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">{skill.name}</div>
-                    </div>
-                    <div
-                      id={`skill-panel-${idx}`}
-                      role="tooltip"
-                      onClick={(e) => e.stopPropagation()}
-                      className={`absolute left-1/2 top-1/2 z-30 w-80 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 -translate-y-1/2 origin-center rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/10 dark:shadow-black/40 transition-all duration-200 ${active ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'} group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100`}
-                    >
-                      <div className="mono text-xs font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wider">{skill.name}</div>
-                      <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{skill.usage}</p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {renderDivider()}
-
-        {/* Experience Section */}
-        <section id="experience" className="py-32 reveal">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-              <div>
-                <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Career_Trace</h2>
-                <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">Professional Log</h3>
-              </div>
-              <div className="text-right">
-                 <div className="text-3xl font-mono text-slate-900 dark:text-slate-100">{CAREER.length.toString().padStart(2, '0')} <span className="text-slate-400 dark:text-slate-500 text-sm">Nodes_Deployed</span></div>
-              </div>
-            </div>
-            <div className="space-y-32">
-              {CAREER.map((item, idx) => (
-                <div key={idx} className="grid md:grid-cols-[300px_1fr] gap-12 group">
-                  <div className="space-y-4">
-                    <div className="text-[10px] mono text-blue-600 dark:text-blue-400 font-bold uppercase tracking-[0.2em] mb-2">{item.period}</div>
-                    <h3 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight">{item.company}</h3>
-                    <div className="inline-block px-3 py-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-800 mono text-[10px] text-slate-600 dark:text-slate-400">{item.role}</div>
-                  </div>
-                  <ul className="space-y-6">
+        {/* Experience */}
+        <Section id="experience" index="01" label="Experience" meta={`${CAREER.length.toString().padStart(2, '0')} roles`} title="Professional Log">
+          <ol className="border-t border-ink">
+            {CAREER.map((item, idx) => (
+              <li key={idx} className="grid md:grid-cols-[180px_1fr] gap-x-12 gap-y-3 py-10 border-b border-rule">
+                <div>
+                  <div className={`${LABEL} tabular-nums`}>{item.period}</div>
+                  <div className="mt-2 text-sm text-muted">{item.company}</div>
+                </div>
+                <div>
+                  <h3 className="font-serif font-normal text-3xl md:text-4xl leading-tight">{item.role}</h3>
+                  <ul className="mt-6 space-y-4 max-w-2xl">
                     {item.desc.map((d, i) => (
-                      <li key={i} className="flex gap-4 text-slate-600 dark:text-slate-400 leading-relaxed text-base border-l border-slate-200 dark:border-slate-800 pl-6 hover:border-slate-900 dark:hover:border-slate-100 transition-all">
+                      <li key={i} className="relative pl-6 text-[15px] leading-relaxed">
+                        <span aria-hidden="true" className="absolute left-0 text-accent">—</span>
                         {d}
                       </li>
                     ))}
                   </ul>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              </li>
+            ))}
+          </ol>
+        </Section>
 
-        {renderDivider()}
-
-        {/* Education Section */}
-        <section id="education" className="py-32 reveal">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-20">
-              <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Foundations</h2>
-              <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">Academic Background</h3>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8">
-              {EDUCATION.map((edu, idx) => (
-                <div key={idx} className="p-10 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors group">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="text-[10px] mono text-blue-600 dark:text-blue-400 font-bold uppercase tracking-[0.2em]">{edu.period}</div>
-                    <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400 opacity-60 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-6 leading-tight">{edu.institution}</h3>
-                  <div className="inline-block px-3 py-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-800 mono text-[10px] text-slate-600 dark:text-slate-400">{edu.degree}</div>
+        {/* Projects */}
+        <Section id="projects" index="02" label="Projects" meta={`${PROJECTS.length.toString().padStart(2, '0')} selected`} title="Technical Portfolio">
+          <div className="grid md:grid-cols-2 gap-x-12 gap-y-14">
+            {PROJECTS.map((proj, idx) => (
+              <article key={idx} className="group border-t border-ink pt-6">
+                <div className={`flex justify-between ${LABEL}`}>
+                  <span className="text-accent">{proj.category}</span>
+                  <span className="tabular-nums">{String(idx + 1).padStart(2, '0')}</span>
                 </div>
-              ))}
-            </div>
+                <h3 className="mt-4 font-serif font-normal text-3xl md:text-4xl leading-tight transition-colors group-hover:text-accent">{proj.title}</h3>
+                <p className="mt-4 text-[15px] leading-relaxed text-muted">{proj.description}</p>
+                <ul className="mt-6 flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-muted" aria-label="Technologies">
+                  {proj.tools.map((t, i) => (
+                    <li key={i} className="after:content-['·'] after:ml-3 last:after:content-none">{t}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
           </div>
-        </section>
+        </Section>
 
-        {renderDivider()}
+        {/* Expertise */}
+        <Section id="skills" index="03" label="Expertise" title={<>Optimized for <em className="italic text-accent">High-Load</em> Environments.</>}>
+          <p className="max-w-2xl text-lg leading-relaxed text-muted mb-14">
+            Specializing in high-performance backend systems. Expert in Java and modern reactive frameworks, focused on building secure, compliant, and horizontally scalable cloud architectures.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 border-t border-l border-rule">
+            {EXPERTISE.map((skill, idx) => {
+              const active = activeSkill === idx;
+              return (
+                <button
+                  type="button"
+                  key={idx}
+                  aria-describedby={`skill-panel-${idx}`}
+                  aria-expanded={active}
+                  onPointerEnter={(e) => keepPanelOnScreen(e.currentTarget)}
+                  onFocus={(e) => keepPanelOnScreen(e.currentTarget)}
+                  onClick={(e) => {
+                    if (!isTouch) return;
+                    keepPanelOnScreen(e.currentTarget);
+                    setActiveSkill(active ? null : idx);
+                  }}
+                  className={`group relative text-left border-r border-b border-rule px-4 py-5 transition-colors hover:bg-paper-2 focus-visible:bg-paper-2 ${active ? 'bg-paper-2' : ''} ${isTouch ? 'cursor-pointer' : 'cursor-default'}`}
+                >
+                  <span className="block font-serif text-xl leading-tight transition-colors group-hover:text-accent">{skill.name}</span>
+                  <span
+                    id={`skill-panel-${idx}`}
+                    role="tooltip"
+                    onClick={(e) => e.stopPropagation()}
+                    className={`absolute left-1/2 top-1/2 z-30 block w-80 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 -translate-y-1/2 origin-center border border-ink bg-paper p-5 text-left transition-all duration-200 ${active ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'} group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100`}
+                  >
+                    <span className="block text-[11px] uppercase tracking-[0.18em] text-accent mb-2">{skill.name}</span>
+                    <span className="block text-sm leading-relaxed">{skill.usage}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </Section>
 
-        {/* Projects Section */}
-        <section id="projects" className="py-32 reveal">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-20">
-              <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Selected_Deployments</h2>
-              <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">Technical Portfolio</h3>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8">
-              {PROJECTS.map((proj, idx) => (
-                <div key={idx} className="p-10 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-800 group relative overflow-hidden hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
-                  <div className="mb-8 mono text-xs text-blue-600 dark:text-blue-400 font-bold tracking-widest uppercase">{proj.category}</div>
-                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-6 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{proj.title}</h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-10 leading-relaxed mono text-sm">{proj.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {proj.tools.map((t, i) => (
-                      <span key={i} className="px-3 py-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-800 mono text-[10px] text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{t}</span>
-                    ))}
-                  </div>
+        {/* Education */}
+        <Section id="education" index="04" label="Education" title="Academic Background">
+          <ol className="border-t border-ink">
+            {EDUCATION.map((edu, idx) => (
+              <li key={idx} className="grid md:grid-cols-[180px_1fr] gap-x-12 gap-y-2 py-8 border-b border-rule">
+                <div className={`${LABEL} tabular-nums`}>{edu.period}</div>
+                <div>
+                  <h3 className="font-serif font-normal text-3xl leading-tight">{edu.institution}</h3>
+                  <p className="mt-2 text-[15px] text-muted">{edu.degree}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              </li>
+            ))}
+          </ol>
+        </Section>
 
-        {renderDivider()}
+        {/* Milestones */}
+        <Section id="achievements" index="05" label="Milestones" title="Recognition & Metrics">
+          <ul className="grid sm:grid-cols-2 gap-x-12 border-t border-ink">
+            {ACHIEVEMENTS.map((a, idx) => (
+              <li key={idx} className="py-6 border-b border-rule">
+                <h3 className="font-serif font-normal text-2xl leading-tight">{a.title}</h3>
+                <p className="mt-1.5 text-[14px] text-muted">{a.detail}</p>
+              </li>
+            ))}
+          </ul>
+        </Section>
 
-        {/* Achievements Section */}
-        <section id="achievements" className="py-32 reveal">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-20">
-              <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Milestones</h2>
-              <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">Recognition & Metrics</h3>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {ACHIEVEMENTS.map((a, idx) => (
-                <div key={idx} className="p-6 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-all group">
-                  <div className="mono text-blue-600 dark:text-blue-400 mb-4 opacity-60 group-hover:opacity-100 transition-opacity"><Award className="w-5 h-5" /></div>
-                  <div className="text-slate-900 dark:text-slate-100 font-bold mb-2 text-sm uppercase tracking-tight">{a.title}</div>
-                  <div className="text-[10px] mono text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300">{a.detail}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Credentials */}
+        <Section id="certifications" index="06" label="Credentials" title="Certifications & Honors">
+          <ul className="grid sm:grid-cols-2 gap-x-12 border-t border-ink">
+            {CERTIFICATIONS.map((c, idx) => (
+              <li key={idx} className="py-6 border-b border-rule">
+                <h3 className="font-serif font-normal text-2xl leading-tight">{c.title}</h3>
+                <p className="mt-1.5 text-[14px] text-muted">{c.issuer}</p>
+              </li>
+            ))}
+          </ul>
+        </Section>
 
-        {renderDivider()}
-
-        {/* Certifications Section */}
-        <section id="certifications" className="py-32 reveal">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-20">
-              <h2 className="text-xs mono text-blue-600 dark:text-blue-400 font-bold tracking-[0.3em] uppercase mb-4">Credentials</h2>
-              <h3 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100">Certifications &amp; Honors</h3>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {CERTIFICATIONS.map((c, idx) => (
-                <div key={idx} className="p-6 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-all group">
-                  <div className="mono text-blue-600 dark:text-blue-400 mb-4 opacity-60 group-hover:opacity-100 transition-opacity"><Award className="w-5 h-5" /></div>
-                  <div className="text-slate-900 dark:text-slate-100 font-bold mb-2 text-sm uppercase tracking-tight">{c.title}</div>
-                  <div className="text-[10px] mono text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300">{c.issuer}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {renderDivider()}
-
-        {/* CTA Section */}
-        <section id="contact" className="py-48 relative overflow-hidden">
-          <div className="max-w-4xl mx-auto px-6 text-center relative z-10 reveal">
-            <div className="w-20 h-20 border border-slate-300 dark:border-slate-700 rounded-full flex items-center justify-center mx-auto mb-10 group cursor-pointer hover:border-slate-900 dark:hover:border-slate-100 transition-colors">
-              <Mail className="text-slate-900 dark:text-slate-100 w-8 h-8 group-hover:scale-110 transition-transform" />
-            </div>
-            <h2 className="text-4xl md:text-7xl font-extrabold text-slate-900 dark:text-slate-100 mb-10 tracking-tighter">
-              Ready to Scale?
+        {/* Contact */}
+        <section id="contact" aria-labelledby="contact-title" className="reveal border-t border-ink">
+          <div className="max-w-6xl mx-auto px-6 py-28 md:py-40">
+            <div className={`${LABEL} tabular-nums`}><span className="text-accent">07</span> — Contact</div>
+            <h2 id="contact-title" className="mt-8 font-serif font-normal text-6xl md:text-8xl xl:text-9xl leading-[0.95] tracking-tight">
+              Ready to <em className="italic text-accent">Scale?</em>
             </h2>
-            <p className="mono text-slate-500 dark:text-slate-400 mb-16 text-lg">Initiate collaboration through official channels.</p>
-            <div className="flex flex-wrap items-center justify-center gap-6">
-              <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className="inline-flex items-center justify-center gap-4 px-12 py-6 min-w-[14rem] border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold mono text-sm hover:border-slate-900 dark:hover:border-slate-100 transition-all transform hover:scale-105">
-                Email <ArrowRight className="w-4 h-4" />
+            <p className="mt-8 max-w-md text-lg text-muted">Initiate collaboration through official channels.</p>
+            <div className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-5 font-serif text-3xl md:text-4xl">
+              <a href={`mailto:${PERSONAL_DATA.professionalEmail}?cc=${PERSONAL_DATA.email}`} className={`inline-flex items-center gap-2 ${TEXT_LINK}`}>
+                Email <ArrowUpRight className="w-6 h-6" aria-hidden="true" />
               </a>
-              <a href={`https://wa.me/${PERSONAL_DATA.whatsapp}`} className="inline-flex items-center justify-center gap-4 px-12 py-6 min-w-[14rem] border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold mono text-sm hover:border-slate-900 dark:hover:border-slate-100 transition-all transform hover:scale-105">
-                WhatsApp <ArrowRight className="w-4 h-4" />
+              <a href={`https://wa.me/${PERSONAL_DATA.whatsapp}`} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 ${TEXT_LINK}`}>
+                WhatsApp <ArrowUpRight className="w-6 h-6" aria-hidden="true" />
               </a>
             </div>
           </div>
         </section>
       </main>
 
-      {renderDivider()}
-
-      <footer className="py-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="mono text-[10px] text-slate-500 dark:text-slate-500 tracking-widest uppercase">
-            System_Time: {currentTime} | &copy; {new Date().getFullYear()} {PERSONAL_DATA.name.toUpperCase()}
-          </div>
-          <div className="flex gap-10 mono text-[10px] font-bold text-slate-500 dark:text-slate-400">
-            <a href="#home" className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline">ROOT</a>
-            <a href="#experience" className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline">EXPERIENCE</a>
-            <a href="#projects" className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline">PROJECTS</a>
+      <footer className="border-t border-ink">
+        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-[12px] text-muted">
+          <div>&copy; {new Date().getFullYear()} {PERSONAL_DATA.name}. {PERSONAL_DATA.location}.</div>
+          <div className="flex flex-wrap gap-x-8 gap-y-2 uppercase tracking-[0.14em] font-medium">
+            <a href={`https://${PERSONAL_DATA.linkedin}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-accent">LinkedIn</a>
+            <a href={`https://${PERSONAL_DATA.github}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-accent">GitHub</a>
+            <a href="#home" className="transition-colors hover:text-accent">Back to top</a>
           </div>
         </div>
       </footer>
